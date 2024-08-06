@@ -1,40 +1,38 @@
-import React, { useState } from "react";
 import {
   Box,
   Divider,
   FormControl,
   MenuItem,
   Paper,
-  Typography,
   Select,
-  Button,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Rating,
-  Pagination,
+  Typography,
+  styled,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import data_json from "../data/medical_data";
+import { useState } from "react";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Rating from "@mui/material/Rating";
+import { useDispatch } from "react-redux";
 import { addItemToCart } from "../redux/cartSlice";
 import api from "../api/link";
-import { styled } from "@mui/system";
 
-const TruncatedTitleTypography = styled(Typography)({
-  display: "-webkit-box",
-  overflow: "hidden",
-  fontSize: 17,
-  WebkitBoxOrient: "vertical",
-  WebkitLineClamp: 1, // Limit to 1 line
-});
-
-const Products = () => {
+const MedicalProducts = () => {
+  const [fulldata, setFullData] = useState(data_json);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [page, setPage] = useState(1);
-  const rowsPerPage = 10; // Number of items per page
-
   const dispatch = useDispatch();
-  const fulldata = useSelector((state) => state.products.items);
+
+  const TruncatedTitleTypography = styled(Typography)(({ theme }) => ({
+    display: "-webkit-box",
+    overflow: "hidden",
+    fontSize: 17,
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 1, // Limit to 3 lines
+  }));
 
   const addToCartHandler = async (data) => {
     const user_id = localStorage.getItem("userid");
@@ -42,7 +40,7 @@ const Products = () => {
       await api.post(
         "/cart/",
         {
-          user_id,
+          user_id: user_id, // Replace with the actual user ID
           product_id: data.id,
           quantity: 1,
         },
@@ -58,25 +56,20 @@ const Products = () => {
     }
   };
 
-  const sortProducts = (order, products) => {
-    return products.slice().sort((a, b) => {
-      if (order === "asc") return a.price - b.price;
-      return b.price - a.price;
-    });
-  };
-
-  const handleSortChange = (event) => {
-    setSortOrder(event.target.value);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const paginatedData = sortProducts(sortOrder, fulldata).slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
+  useEffect(() => {
+    // Sort function
+    const sortProducts = (order) => {
+      const sortedData = [...fulldata].sort((a, b) => {
+        if (order === "asc") {
+          return a.price - b.price;
+        } else {
+          return b.price - a.price;
+        }
+      });
+      setFullData(sortedData);
+    };
+    sortProducts(sortOrder);
+  }, [sortOrder, fulldata]);
 
   return (
     <Paper sx={{ padding: "8px 16px", flex: "9" }}>
@@ -91,11 +84,11 @@ const Products = () => {
         <FormControl sx={{ mb: 2, minWidth: 120 }}>
           <Select
             value={sortOrder}
-            onChange={handleSortChange}
+            onChange={(e) => setSortOrder(e.target.value)}
             sx={{ height: "35px" }}
           >
-            <MenuItem value="asc">Price: Low to High</MenuItem>
-            <MenuItem value="desc">Price: High to Low</MenuItem>
+            <MenuItem value={"asc"}>Price: Low to High</MenuItem>
+            <MenuItem value={"desc"}>Price: High to Low</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -105,7 +98,7 @@ const Products = () => {
         spacing={{ xs: 2, md: 3 }}
         columns={{ xs: 4, sm: 8, md: 12 }}
       >
-        {paginatedData.map((data) => (
+        {fulldata.map((data) => (
           <Grid
             item
             xs={12}
@@ -117,7 +110,7 @@ const Products = () => {
             <Card sx={{ maxWidth: 345 }}>
               <CardMedia
                 sx={{ height: 225 }}
-                image={data.image_url}
+                image={data.images}
                 title={data.title}
               />
               <CardContent>
@@ -128,12 +121,14 @@ const Products = () => {
                 >
                   {data.title}
                 </TruncatedTitleTypography>
+
                 <Rating
                   name="read-only"
                   value={3}
                   readOnly
                   sx={{ marginRight: "auto" }}
                 />
+
                 <TruncatedTitleTypography
                   gutterBottom
                   variant="h6"
@@ -141,6 +136,7 @@ const Products = () => {
                 >
                   ${data.price}
                 </TruncatedTitleTypography>
+
                 <Button size="small" onClick={() => addToCartHandler(data)}>
                   Add to cart
                 </Button>
@@ -149,16 +145,9 @@ const Products = () => {
           </Grid>
         ))}
       </Grid>
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-        <Pagination
-          count={Math.ceil(fulldata.length / rowsPerPage)}
-          page={page}
-          onChange={handleChangePage}
-          shape="rounded"
-        />
-      </Box>
     </Paper>
+    // </React.Fragment>
   );
 };
 
-export default Products;
+export default MedicalProducts;

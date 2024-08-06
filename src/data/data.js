@@ -347,7 +347,7 @@ const data = [
   },
   {
     id: 136,
-    title: "New Product",
+    title: "New0 Product",
     price: 53,
     name: "Electronics",
 
@@ -359,7 +359,7 @@ const data = [
   },
   {
     id: 137,
-    title: "New Product",
+    title: "New9 Product",
     price: 53,
     name: "Electronics",
 
@@ -371,7 +371,7 @@ const data = [
   },
   {
     id: 138,
-    title: "New Product",
+    title: "New8 Product",
     price: 10,
     name: "Clothes",
 
@@ -383,7 +383,7 @@ const data = [
   },
   {
     id: 139,
-    title: "New Product",
+    title: "New7 Product",
     price: 53,
     name: "Electronics",
 
@@ -395,7 +395,7 @@ const data = [
   },
   {
     id: 140,
-    title: "New Product",
+    title: "New6 Product",
     price: 10,
     name: "Clothes",
 
@@ -407,7 +407,7 @@ const data = [
   },
   {
     id: 141,
-    title: "New Product",
+    title: "New5 Product",
     price: 53,
     name: "Electronics",
 
@@ -419,7 +419,7 @@ const data = [
   },
   {
     id: 142,
-    title: "New Product 141",
+    title: "New4 Product 141",
     price: 141,
     name: "Clothes",
     description:
@@ -430,7 +430,7 @@ const data = [
   },
   {
     id: 143,
-    title: "New product",
+    title: "New3 product",
     price: 586,
     name: "Miscellaneous",
 
@@ -442,7 +442,7 @@ const data = [
   },
   {
     id: 144,
-    title: "New Product xxx",
+    title: "New Product2 xxx",
     price: 100000,
     name: "Clothes",
 
@@ -454,7 +454,7 @@ const data = [
   },
   {
     id: 145,
-    title: "New Product xxx",
+    title: "New Product1 xxx",
     price: 100000,
     name: "Clothes",
 

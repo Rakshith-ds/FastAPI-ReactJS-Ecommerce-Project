@@ -5,26 +5,32 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { Link } from "react-router-dom";
-import { Badge, InputBase, alpha, styled } from "@mui/material";
+import { Badge, alpha, styled, useTheme } from "@mui/material";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import api from "../api/link";
-import { useEffect } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { cartQuantityUpdateOnLogin } from "../redux/cartSlice";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import data_json from "../data/data";
+import { useNavigate } from "react-router-dom";
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Navbar1() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [fulldata, setFullData] = useState(data_json);
   const dispatch = useDispatch();
-  // const [cartQuantity, setCartQuantity] = React.useState(0);
+  const Navigate = useNavigate();
+  const theme = useTheme(); // Access the theme object
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -37,7 +43,7 @@ function Navbar1() {
   const handleUserMenuClick = (settings) => {
     if (settings === "Logout") {
       localStorage.clear();
-      window.location.href = "/login";
+      window.location.href = "/landingpage/login";
     }
   };
 
@@ -76,41 +82,30 @@ function Navbar1() {
     justifyContent: "center",
   }));
 
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: "inherit",
-    "& .MuiInputBase-input": {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("md")]: {
-        width: "20ch",
-      },
-    },
-  }));
-
   const Quantity = useSelector((state) => state.cart.totalQuantity);
 
+  const fetchCartItems = useCallback(async () => {
+    try {
+      const response = await api.get("/cart/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      dispatch(cartQuantityUpdateOnLogin(JSON.stringify(response.data)));
+    } catch (error) {
+      console.error("Error fetching cart items", error);
+      alert("Session expired");
+      Navigate("/signin");
+    }
+  }, [dispatch, Navigate]);
+
   useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        const response = await api.get("/cart/", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        });
-        // setCartQuantity(response.data.quantity);
-      } catch (error) {
-        console.error("Error fetching cart items", error);
-      }
-    };
     fetchCartItems();
-  }, [dispatch]);
+  }, []);
 
   return (
     <React.Fragment>
-      <AppBar position="relative">
+      <AppBar position="sticky">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
@@ -118,7 +113,7 @@ function Navbar1() {
               variant="h6"
               noWrap
               component="a"
-              href="#app-bar-with-responsive-menu"
+              href="/landingpage/products"
               sx={{
                 mr: 2,
                 display: { xs: "none", md: "flex" },
@@ -128,18 +123,6 @@ function Navbar1() {
             >
               EcommerceCart
             </Typography>
-
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-            </Box>
             <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
             <Typography
               variant="h5"
@@ -170,9 +153,39 @@ function Navbar1() {
                 <SearchIconWrapper>
                   <SearchIcon />
                 </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search…"
-                  inputProps={{ "aria-label": "search" }}
+                <Autocomplete
+                  freeSolo
+                  // value={inputValue}
+                  // onChange={(event, newValue) => {
+                  //   setInputValue(newValue);
+                  // }}
+                  options={fulldata.map((option) => ({
+                    title: option.title,
+                    id: option.id,
+                  }))}
+                  getOptionLabel={(option) => option.title || ""}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Search…"
+                      inputProps={{
+                        ...params.inputProps,
+                        "aria-label": "search",
+                      }}
+                    />
+                  )}
+                  sx={{
+                    width: "100%",
+                    "& .MuiInputBase-root": {
+                      padding: "1px 1px 1px 0",
+                      paddingLeft: `calc(1em + ${theme.spacing(4)})`, // Use theme here
+                      transition: theme.transitions.create("width"),
+                      width: "100%",
+                      [theme.breakpoints.up("md")]: {
+                        width: "50ch",
+                      },
+                    },
+                  }}
                 />
               </Search>
             </Box>
@@ -191,7 +204,7 @@ function Navbar1() {
                 </IconButton>
               </Tooltip>
               <Menu
-                sx={{ mt: "45px" }}
+                sx={{ mt: "45px", paddingTop: "0px" }}
                 id="menu-appbar"
                 anchorEl={anchorElUser}
                 anchorOrigin={{
@@ -227,10 +240,10 @@ function Navbar1() {
                   aria-label="cart"
                   sx={{ color: "white" }}
                   component={Link}
-                  to="/landingpage/Cart"
+                  to="/landingpage/cart"
                 >
                   <StyledBadge
-                    badgeContent={Quantity}
+                    badgeContent={Quantity < 1 ? 0 : Quantity}
                     color="secondary"
                     showZero
                   >

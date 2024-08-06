@@ -9,6 +9,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Rating from "@mui/material/Rating";
 import api from "../api/link";
+import { useCallback } from "react";
 
 const Cart = () => {
   const [totalQuantity, setTotalQuantity] = React.useState(0);
@@ -16,7 +17,7 @@ const Cart = () => {
   const dispatch = useDispatch();
   const [cartItems, setCartItems] = React.useState([]);
 
-  const fetchCartItems = async () => {
+  const fetchCartItems = useCallback(async () => {
     try {
       const response = await api.get("/cart/", {
         headers: {
@@ -29,27 +30,30 @@ const Cart = () => {
     } catch (error) {
       console.error("Error fetching cart items", error);
     }
-  };
+  }, []);
 
-  const removeFromCartHandler = async (id) => {
-    try {
-      const response = await api.delete(`/cart/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
-      dispatch(removeItemFromCart(id));
+  const removeFromCartHandler = useCallback(
+    async (id) => {
+      try {
+        const response = await api.delete(`/cart/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        dispatch(removeItemFromCart(id));
 
-      if (response.status === 200) {
-        // Fetch the updated cart data after deleting the item
-        fetchCartItems();
-      } else {
-        console.error("Failed to remove item from the database");
+        if (response.status === 200) {
+          // Fetch the updated cart data after deleting the item
+          fetchCartItems();
+        } else {
+          console.error("Failed to remove item from the database");
+        }
+      } catch (error) {
+        console.error("Error removing item from the cart:", error);
       }
-    } catch (error) {
-      console.error("Error removing item from the cart:", error);
-    }
-  };
+    },
+    [dispatch, fetchCartItems]
+  );
 
   const TruncatedTitleTypography = styled(Typography)(({ theme }) => ({
     display: "-webkit-box",
@@ -61,7 +65,7 @@ const Cart = () => {
 
   useEffect(() => {
     fetchCartItems();
-  }, []);
+  }, [fetchCartItems]);
 
   return (
     <Box
@@ -94,7 +98,7 @@ const Cart = () => {
                 >
                   <CardMedia
                     sx={{ width: { xs: "100%", sm: "20%" } }}
-                    image={item.image_url}
+                    image={item.images}
                     title={item.title}
                   />
                   <CardContent
@@ -131,7 +135,7 @@ const Cart = () => {
                       </TruncatedTitleTypography>
                       <Button
                         size="small"
-                        onClick={() => removeFromCartHandler(item.product_id)}
+                        onClick={() => removeFromCartHandler(item.id)}
                       >
                         Delete Item
                       </Button>
@@ -166,8 +170,8 @@ const Cart = () => {
       >
         <Paper sx={{ padding: 3 }}>
           <Typography sx={{ mb: 2 }}>
-            Subtotal ({totalQuantity === 0 ? 0 : totalQuantity} items): $
-            {totalPrice}
+            Subtotal ({totalQuantity < 1 ? 0 : totalQuantity} items): $
+            {totalPrice < 1 ? 0 : totalPrice}
           </Typography>
           <Button variant="contained" fullWidth>
             Proceed to checkout

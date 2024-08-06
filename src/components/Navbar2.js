@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -12,21 +12,20 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 
 const pages = [
-  "Products",
-  "Medical Care",
-  "Groceries",
-  "Best Sellers",
-  "Amazon Basics",
-  "New Releases",
-  "Music",
-  "Prime",
-  "Customer Service",
-  "Today's Deals",
-  "Amazon Home",
+  "All",
+  "Electronics",
+  "Furniture",
+  "Shoes",
+  "Miscellaneous",
+  "Home Decoration",
+  "Fashion",
+  "Beauty Product",
+  "Clothes",
 ];
 
-function Navbar2() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
+function Navbar2({ setSelectedPage }) {
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [selectedPage, setSelectedPageLocal] = useState("All"); // State to track selected page
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -34,6 +33,12 @@ function Navbar2() {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleMenuItemClick = (page) => {
+    setSelectedPageLocal(page);
+    setSelectedPage(page); // Update parent component's state
+    handleCloseNavMenu(); // Close the menu on mobile view
   };
 
   return (
@@ -77,12 +82,18 @@ function Navbar2() {
                 }}
               >
                 {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <MenuItem
+                    key={page}
+                    onClick={() => handleMenuItemClick(page)}
+                  >
                     <Typography
                       textAlign="center"
                       component={Link}
                       to={"/landingpage/" + page.toLowerCase()}
-                      sx={{ textDecoration: "none", color: "inherit" }}
+                      sx={{
+                        textDecoration: "none",
+                        color: "inherit",
+                      }}
                     >
                       {page}
                     </Typography>
@@ -97,9 +108,10 @@ function Navbar2() {
                   key={page}
                   component={Link}
                   to={"/landingpage/" + page.toLowerCase()}
+                  onClick={() => handleMenuItemClick(page)}
                   sx={{
                     my: 2,
-                    color: "white",
+                    color: selectedPage === page ? "yellow" : "white", // Highlight selected button
                     display: "block",
                     textDecoration: "none",
                   }}
