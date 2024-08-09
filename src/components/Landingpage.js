@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar1 from "./Navbar1";
 import Navbar2 from "./Navbar2";
-import Sidebar from "./Sidebar";
 import { Stack, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import Products from "../components/Products";
@@ -48,8 +47,7 @@ export default function Landingpage() {
         <Navbar1 mode={mode} setMode={setMode} />
         <Navbar2 setSelectedPage={setSelectedPage} />
         <Stack direction="row" gap={2} sx={{ marginTop: "20px" }}>
-          {!isCartPage && <Sidebar />}
-          {!isCartPage && <Products />}
+          {!isCartPage && <Products selectedPage={selectedPage} />}
           {isCartPage && <Outlet />}
         </Stack>
       </React.Fragment>

@@ -1,12 +1,12 @@
 import * as React from "react";
 import Divider from "@mui/material/Divider";
-import Paper from "@mui/material/Paper";
 import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { Check } from "@mui/icons-material";
 import { Typography } from "@mui/material";
+import Box from "@mui/material/Box";
 
 export default function IconMenu() {
   const [selectedIndex, setSelectedIndex] = React.useState(null);
@@ -47,7 +47,7 @@ export default function IconMenu() {
   ));
 
   return (
-    <Paper sx={{ flex: 2, maxWidth: "100%" }}>
+    <Box sx={{ flex: 2, maxWidth: "100%" }}>
       <MenuList dense>
         <Typography variant="h6" component="h6" sx={{ padding: "8px 16px" }}>
           All Departments
@@ -58,6 +58,6 @@ export default function IconMenu() {
         <Divider />
         {renderMenuItems.slice(5)}
       </MenuList>
-    </Paper>
+    </Box>
   );
 }

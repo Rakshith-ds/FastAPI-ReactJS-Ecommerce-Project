@@ -105,7 +105,16 @@ function Navbar1() {
 
   return (
     <React.Fragment>
-      <AppBar position="sticky">
+      <AppBar
+        position="sticky"
+        // position="fixed"
+        sx={{
+          top: 0,
+          left: 0,
+          width: "100%",
+          zIndex: 1200, // Higher z-index to ensure it's above the second navbar
+        }}
+      >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />

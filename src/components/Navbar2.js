@@ -44,8 +44,14 @@ function Navbar2({ setSelectedPage }) {
   return (
     <React.Fragment>
       <AppBar
-        position="relative"
-        sx={{ height: "50px", backgroundColor: "black" }}
+        position="sticky"
+        sx={{
+          top: "64px", // Position below the first navbar
+          left: 0,
+          width: "100%",
+          zIndex: 1199, // Ensure it is below the first navbar
+          backgroundColor: "black",
+        }}
       >
         <Container maxWidth="xl" sx={{ height: "50px" }}>
           <Toolbar
@@ -89,7 +95,7 @@ function Navbar2({ setSelectedPage }) {
                     <Typography
                       textAlign="center"
                       component={Link}
-                      to={"/landingpage/" + page.toLowerCase()}
+                      to={"/landingpage/" + page.split(" ").join("")}
                       sx={{
                         textDecoration: "none",
                         color: "inherit",
@@ -107,7 +113,7 @@ function Navbar2({ setSelectedPage }) {
                 <Button
                   key={page}
                   component={Link}
-                  to={"/landingpage/" + page.toLowerCase()}
+                  to={"/landingpage/" + page.split(" ").join("")}
                   onClick={() => handleMenuItemClick(page)}
                   sx={{
                     my: 2,
